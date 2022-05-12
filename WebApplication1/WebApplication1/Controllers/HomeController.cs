@@ -62,7 +62,7 @@ namespace WebApplication1.Controllers
                         ProductId = (int)id,
                         Count = count,
                         Color = colorid,
-                        Size = sizeid
+                        Size = sizeid,
                     });
                 }
             }
@@ -80,7 +80,6 @@ namespace WebApplication1.Controllers
             }
 
 
-            HttpContext.Response.Cookies.Append("basket", JsonConvert.SerializeObject(basketVMs));
 
             foreach (BasketVM basketVM in basketVMs)
             {
@@ -89,7 +88,51 @@ namespace WebApplication1.Controllers
                 basketVM.Image = dbProduct.Image;
                 basketVM.Price = dbProduct.DiscountPrice > 0 ? dbProduct.DiscountPrice : dbProduct.Price;
                 basketVM.Name = dbProduct.Name;
+                basketVM.ExTax = dbProduct.ExTax;
             }
+            HttpContext.Response.Cookies.Append("basket", JsonConvert.SerializeObject(basketVMs));
+
+
+
+
+            if (User.Identity.IsAuthenticated)
+            {
+                AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.FullName.ToLower() == User.Identity.Name.ToLower() && !u.IsAdmin);
+                List<Basket> existedBasket = await _context.Baskets.Where(b => b.AppUserId == appUser.Id).ToListAsync();
+                List<Basket> baskets = new List<Basket>();
+                foreach (BasketVM basketVM in basketVMs)
+                {
+                    if (existedBasket.Any(b => b.ProductId == basketVM.ProductId && b.SizeId == basketVM.Size && b.ColorId == basketVM.Color))
+                    {
+                        existedBasket.Find(b => b.ProductId == basketVM.ProductId && b.SizeId == basketVM.Size && b.ColorId == basketVM.Color).Count = basketVM.Count;
+                    }
+                    else
+                    {
+                        Basket basket = new Basket
+                        {
+                            AppUserId = appUser.Id,
+                            ProductId = basketVM.ProductId,
+                            Count = basketVM.Count,
+                            ColorId = basketVM.Color,
+                            SizeId = basketVM.Size,
+                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                        };
+                        //_context.Baskets.RemoveRange(existedBasket);
+                        baskets.Add(basket);
+                    }
+
+
+                }
+
+                if (baskets.Count > 0)
+                {
+                    await _context.Baskets.AddRangeAsync(baskets);
+                }
+                await _context.SaveChangesAsync();
+            }
+
+
+
             return PartialView("_BasketPartial", basketVMs);
         }
 
@@ -154,6 +197,7 @@ namespace WebApplication1.Controllers
                 basketVM.Image = dbProduct.Image;
                 basketVM.Price = dbProduct.DiscountPrice > 0 ? dbProduct.DiscountPrice : dbProduct.Price;
                 basketVM.Name = dbProduct.Name;
+                basketVM.ExTax = dbProduct.ExTax;
             }
 
             return basketVMs.Count();

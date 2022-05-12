@@ -150,9 +150,9 @@ namespace WebApplication1.Controllers
                 List<Basket> existedBasket = await _context.Baskets.Where(b => b.AppUserId == appUser.Id).ToListAsync();
                 foreach (BasketVM basketVM in basketVMs)
                 {
-                    if (existedBasket.Any(b => b.ProductId == basketVM.ProductId))
+                    if (existedBasket.Any(b => b.ProductId == basketVM.ProductId && b.SizeId == basketVM.Size && b.ColorId == basketVM.Color))
                     {
-                        existedBasket.Find(b => b.ProductId == basketVM.ProductId).Count = basketVM.Count;
+                        existedBasket.Find(b => b.ProductId == basketVM.ProductId && b.SizeId == basketVM.Size && b.ColorId == basketVM.Color).Count = basketVM.Count;
                     }
                     else
                     {

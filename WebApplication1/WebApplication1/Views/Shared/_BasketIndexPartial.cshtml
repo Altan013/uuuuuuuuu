@@ -27,8 +27,8 @@
                                     <td class="pro-thumbnail"><a href="#"><img class="img-fluid" src="assets/img/product/@item.Image" alt="Product" /></a></td>
                                     <td class="pro-title"><a href="#">@item.Name</a></td>
                                     <td class="pro-price"><span>$@item.Price</span></td>
-                                    <td class="pro-price"><span>@item.Color</span></td>
-                                    <td class="pro-price"><span>@item.Size</span></td>
+                                    <td class="pro-price prColor"><span>@item.Color</span></td>
+                                    <td class="pro-price prSize"><span>@item.Size</span></td>
 
                                     <td class="pro-quantity">
                                         <div class="pro-qty" style="display : flex;justify-content : space-between;align-items : center;padding : 13px;">
@@ -39,7 +39,7 @@
                                     </td>
 
                                     <td class="pro-subtotal"><span>$@(item.Price*item.Count)</span></td>
-                                    <td class="pro-remove"><a class="deletecard" asp-action="DeleteCard" asp-route-id="@item.ProductId"><i class="fa fa-trash-o"></i></a></td>
+                                    <td class="pro-remove"><a class="deletecard" asp-action="DeleteCard" asp-route-id="@item.ProductId" asp-route-color="@item.Color" asp-route-size="@item.Size"><i class="fa fa-trash-o"></i></a></td>
                                 </tr>
                                 }
                             </tbody>

@@ -16,5 +16,6 @@ namespace WebApplication1.ViewModels.Basket
         public int ProductId { get; set; }
         public int Color { get; set; }
         public int Size { get; set; }
+        public double ExTax { get; set; }
     }
 }

@@ -77,20 +77,26 @@
     $(document).on("click", ".qtybtn", function (e) {
         e.preventDefault()
         let url = $(this).attr("href");
-        var count = $(this).parent().find('input').val();
+        var count = parseInt($(this).parent().find('input').val());
+        if (isNaN(count)) {
+            count = 1;
+        }
+
         var id = $(this).parent().find('input').attr("data-id");
 
-            if ($(this).hasClass("dec")) {
+        let color = parseFloat($(this).parent().parent().parent().find(".prColor").text());
+        let size = parseFloat($(this).parent().parent().parent().find(".prSize").text());
+        if ($(this).hasClass("dec")) {
 
-                if (count != 0) {
-                    count--;
-                }
+            if (count != 0) {
+                count--;
             }
-            else {
-                count++;
-            }
+        }
+        else {
+            count++;
+        }
 
-        fetch("Basket/Update" + "?id=" + id + "&count=" + count).then(response => {
+        fetch("Basket/Update" + "?id=" + id + "&count=" + count + "&color=" + color + "&size=" + size).then(response => {
 
             fetch("Basket/GetBasket").then(response => response.text())
                 .then(data => $(".minicart-inner").html(data))

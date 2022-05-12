@@ -20,10 +20,24 @@ namespace WebApplication1.Areas.Manage.Controllers
         {
             _context = context;
         }
-        public async Task<ActionResult> Index(int page = 1)
+        public async Task<ActionResult> Index(bool? status,int page = 1)
         {
-            List<Review> reviews = await _context.Reviews
-                .Include(r=>r.Blog).ToListAsync();
+            ViewBag.Status = status;
+            List<Review> reviews = new List<Review>();
+            if (status == null)
+            {
+                reviews = await _context.Reviews
+                    .Include(r => r.Blog)
+                    .ToListAsync();
+            }
+            else
+            {
+                reviews = await _context.Reviews
+                    .Include(r => r.Blog)
+                    .Where(r => r.IsDeleted == status)
+                    .ToListAsync();
+
+            }
             ViewBag.PageIndex = page;
             ViewBag.PageCount = Math.Ceiling((double)reviews.Count() / 5);
             return View(reviews.Skip((page - 1) * 5).Take(5));
@@ -33,7 +47,7 @@ namespace WebApplication1.Areas.Manage.Controllers
             if (id == null) return BadRequest();
             Review dbReview = await _context.Reviews
                 .Include(r => r.Blog)
-                .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
+                .FirstOrDefaultAsync(r => r.Id == id);
             if (dbReview == null) return NotFound();
 
             return View(dbReview);
@@ -61,11 +75,34 @@ namespace WebApplication1.Areas.Manage.Controllers
             if (id == null) return BadRequest();
 
             Review review = await _context.Reviews
-                .Include(r=>r.Blog)
+                .Include(r => r.Blog)
                 .FirstOrDefaultAsync(r => r.Id == id);
             if (review == null) return NotFound();
 
             return View(review);
+        }
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return BadRequest();
+
+            Review review = await _context.Reviews
+                .FirstOrDefaultAsync(r => r.Id == id);
+            if (review == null) return NotFound();
+            review.IsDeleted = true;
+            review.DeletedAt = DateTime.UtcNow.AddHours(4);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("index");
+        }
+        public async Task<IActionResult> Restore(int? id)
+        {
+            if (id == null) return BadRequest();
+
+            Review review = await _context.Reviews
+                .FirstOrDefaultAsync(r => r.Id == id);
+            if (review == null) return NotFound();
+            review.IsDeleted = false;
+            await _context.SaveChangesAsync();
+            return RedirectToAction("index");
         }
     }
 }

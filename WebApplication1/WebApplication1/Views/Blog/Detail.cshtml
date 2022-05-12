@@ -151,27 +151,54 @@
                                     {
                                         foreach (Review review in Model.Reviews)
                                         {
-                                    <li>
-                                        <div class="author-avatar">
-                                            <img src="assets/img/blog/comment-icon.png" alt="">
-                                        </div>
-                                        <div class="comment-body">
-                                            <span class="reply-btn"><a href="#">Reply</a></span>
-                                            <h5 class="comment-author">@review.Name</h5>
-                                            <div class="comment-post-date">
-                                                @review.CreatedAt
-                                            </div>
-                                            <p>
-                                                @review.Message
-                                            </p>
-                                        </div>
-                                        @if (review.Name == User.Identity.Name)
-                                        {
-                                            <div class="comment-body" style="flex-basis: 0;">
-                                                <span class="reply-btn"><a asp-action="edit" asp-controller="blog" asp-route-id="@review.Id">Change</a></span>
-                                                </div>
-                                                }
-                                        </li>
+                                            if (!review.IsDeleted)
+                                            {
+                                                <li>
+                                                    <div class="author-avatar">
+                                                        <img src="assets/img/blog/comment-icon.png" alt="">
+                                                    </div>
+                                                    <div class="comment-body">
+                                                        <span class="reply-btn"><a href="#">Reply</a></span>
+                                                        <h5 class="comment-author">@review.Name</h5>
+                                                        <div class="comment-post-date">
+                                                            @review.CreatedAt
+                                                        </div>
+                                                        <p>
+                                                            @review.Message
+                                                        </p>
+                                                    </div>
+                                                    @if (review.Name == User.Identity.Name)
+                                                    {
+                                                        <div class="comment-body" style="flex-basis: 0;">
+                                                            <span class="reply-btn"><a asp-action="edit" asp-controller="blog" asp-route-id="@review.Id">Change</a></span>
+                                                        </div>
+                                                    }
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <div class="author-avatar">
+                                                        <img src="assets/img/blog/comment-icon.png" alt="">
+                                                    </div>
+                                                    <div class="comment-body">
+                                                        <span class="reply-btn"><a href="#">Reply</a></span>
+                                                        <h5 class="comment-author">@review.Name</h5>
+                                                        <div class="comment-post-date">
+                                                            @review.CreatedAt
+                                                        </div>
+                                                        <p>
+                                                            <i class="text-danger">This comment blocked</i>
+                                                        </p>
+                                                    </div>
+                                                    @if (review.Name == User.Identity.Name)
+                                                    {
+                                                        <div class="comment-body" style="flex-basis: 0;">
+                                                            <span class="reply-btn"><a asp-action="edit" asp-controller="blog" asp-route-id="@review.Id">Change</a></span>
+                                                        </div>
+                                                    }
+                                                </li>
+                                            }
                                         }
                                     }
                                 </ul>
